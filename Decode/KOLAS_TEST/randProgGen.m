@@ -15,7 +15,7 @@ set_hash = {'20'};
 set_lights = [set_light_1in set_light_2in set_light_3in];
 set_heavys = [set_heavy_1in set_heavy_2in];
 
-% signextend, lt, gt, slt, sgt, and, or, xor, not, byte, sar are not included
+% signextend, slt, sgt, and, or, xor, byte, sar are not included
 set_arith_samples = {'01', '02', '03', '04', '20', '05', '06', '07', '08', '09', '0a'};
 set_logic_samples = {'14', '15', '1b', '1c', '10', '11', '19'};
 
