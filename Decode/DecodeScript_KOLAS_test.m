@@ -5,7 +5,7 @@ global oplist code set_pushes set_ariths set_dups set_swaps set_logs cjmplist ..
  set_normalhalt storage_pt callcode_suffix callcode_suffix_pt ...
  callresultlist call_pointer vmTraceStep
 
-code = text2code('test_simple\bytes_test_simple.txt');
+code = text2code('KOLAS_TEST\test_program\bytes_test_program.txt');
 codelen=length(code);
 
 %suffix callcode used to prove and verify the bool result of each CALL: (current)calldepth<1024 && value<=balance
@@ -23,7 +23,7 @@ environ_pts.Iv_len=32;
 environ_pts.Id_pt=environ_pts.Iv_pt+environ_pts.Iv_len; %input data I_d
 %Iddata= ...
 %lower('a9059cbb000000000000000000000000ab8483f64d9c6d1ecf9b849ae677dd3315835cb2000000000000000000000000000000000000000000000000000000000000000a'); % Call Data in remix debugger
-Iddata = lower('958ec7d1000000000000000000000000ab8483f64d9c6d1ecf9b849ae677dd3315835cb2000000000000000000000000000000000000000000000000000000000000000a');
+Iddata = lower('45152ae300000000000000000000000000000000000000000000000000000000'); %should be greater than 32 bytes, zero-pad at the end
 environ_pts.Id_len=(length(Iddata))/2;
 environ_pts.Id_len_info_pt=environ_pts.Id_pt+environ_pts.Id_len;
 environ_pts.Id_len_info_len=2;
@@ -45,7 +45,7 @@ environ_pts.zero_pt = environ_pts.balance_pt+environ_pts.balance_len;
 environ_pts.zero_len=1;
 
 % storage data
-storagedata = {'0f4236'; '0f4240';  '64746b0000000000000000000000000000000000000000000000000000000006'; '0a'; '646572697665000000000000000000000000000000000000000000000000000c'};
+storagedata = {'02'; '0d';  '09'; '11'};
 environ_pts.storage_pts = zeros(1, length(storagedata));
 environ_pts.storage_lens = zeros(1, length(storagedata));
 environ_pts.storage_pts(1) = environ_pts.zero_pt+environ_pts.zero_len;
@@ -99,7 +99,7 @@ callresultlist=[]; %op_pointers
 call_pointer=0;
 
 % Hardcode Initial storage keys
-storage_keys = {'58f8e73c330daffe64653449eb9a999c1162911d5129dd8193c7233d46ade2d5'; '0000000000000000000000000000000000000000000000000000000000000002'; '0000000000000000000000000000000000000000000000000000000000000004'; '1a1017a437881fd8fee8ab135586d886995df9286bd91e5d3c250f79b2327f02'; '646572697665000000000000000000000000000000000000000000000000000c'};
+storage_keys = {'0000000000000000000000000000000000000000000000000000000000000000'; '0000000000000000000000000000000000000000000000000000000000000001'; '0000000000000000000000000000000000000000000000000000000000000002'; '0000000000000000000000000000000000000000000000000000000000000003'};
 for i=1:length(storage_keys)
     storage_pt(storage_keys{i}) = [0 environ_pts.storage_pts(i) environ_pts.storage_lens(i)];
 end
@@ -129,7 +129,7 @@ for k=1:s_F
     k_pt_outputs=oplist(k).pt_outputs;
     k_outputs=[];
     for i=1:size(k_pt_outputs,1)
-        oldDigits=digits(78);
+        oldDigits=digits(77);
         k_output = eval_EVM(k_pt_outputs(i,:));
         flag=double(k_output>=p);
         digits(oldDigits);
@@ -287,10 +287,10 @@ end
 
 SetData_I_V=[I_V_len I_V rowInv_I_V];
 SetData_I_P=[I_P_len I_P rowInv_I_P];
-fdset1=fopen('test_simple\Set_I_V.bin', 'w');
-fdset2=fopen('test_simple\Set_I_P.bin', 'w');
-fdOpList=fopen('test_simple\OpList.bin', 'w');
-fdWireList=fopen('test_simple\WireList.bin', 'w');
+fdset1=fopen('KOLAS_TEST\test_program\Set_I_V.bin', 'w');
+fdset2=fopen('KOLAS_TEST\test_program\Set_I_P.bin', 'w');
+fdOpList=fopen('KOLAS_TEST\test_program\OpList.bin', 'w');
+fdWireList=fopen('KOLAS_TEST\test_program\WireList.bin', 'w');
 fwrite(fdset1, SetData_I_V, 'uint32');
 fwrite(fdset2, SetData_I_P, 'uint32');
 fwrite(fdOpList, [length(OpLists) OpLists], 'uint32');
@@ -319,7 +319,11 @@ for k=1:length(oplist)
     end
     for i=1:length(inputs_hex)
         if i<=length(inputs)
-            inputs_hex{i} = strcat('0x', hd_dec2hex(inputs(i),64));
+            data = inputs(i);
+            if ~strcmp(oplist(k).opcode, '20')
+                data = mod(data, p);
+            end
+            inputs_hex{i} = strcat('0x', hd_dec2hex(data,64));
         else
             inputs_hex{i} = '0x0';
         end
@@ -327,7 +331,11 @@ for k=1:length(oplist)
     
     for i=1:length(outputs_hex)
         if i<=length(outputs)
-            outputs_hex{i} = strcat('0x', hd_dec2hex(outputs(i),64));
+            data = outputs(i);
+            if ~strcmp(oplist(k).opcode, '20')
+                data = mod(data, p);
+            end
+            outputs_hex{i} = strcat('0x', hd_dec2hex(data,64));
         else
             outputs_hex{i} = '0x0';
         end
@@ -343,11 +351,11 @@ for k=1:length(oplist)
             end
         end
     end
- 
+    
     InstanceFormatIn(k).in=inputs_hex;
     InstanceFormatOut(k).out=outputs_hex;
-    fdInput=fopen(['test_simple\instance\Input_opcode' num2str(k-1) '.json'], 'w');
-    fdOutput=fopen(['test_simple\instance\Output_opcode' num2str(k-1) '.json'], 'w');
+    fdInput=fopen(['KOLAS_TEST\test_program\instance\Input_opcode' num2str(k-1) '.json'], 'w');
+    fdOutput=fopen(['KOLAS_TEST\test_program\instance\Output_opcode' num2str(k-1) '.json'], 'w');
     
     fprintf(fdInput, jsonencode(InstanceFormatIn(k)));
     fprintf(fdOutput, jsonencode(InstanceFormatOut(k)));

@@ -5,7 +5,7 @@ global oplist code set_pushes set_ariths set_dups set_swaps set_logs cjmplist ..
  set_normalhalt storage_pt callcode_suffix callcode_suffix_pt ...
  callresultlist call_pointer
 
-code = text2code('test_transfer\bytes_schnorr_prove1.txt');
+code = text2code('test_transfer\bytes_test_transfer.txt');
 codelen=length(code);
 
 %suffix callcode used to prove and verify the bool result of each CALL: (current)calldepth<1024 && value<=balance
