@@ -354,8 +354,8 @@ for k=1:length(oplist)
     
     InstanceFormatIn(k).in=inputs_hex;
     InstanceFormatOut(k).out=outputs_hex;
-    fdInput=fopen(['KOLAS_TEST\test_program\instance\Input_opcode' num2str(k-1) '.json'], 'w');
-    fdOutput=fopen(['KOLAS_TEST\test_program\instance\Output_opcode' num2str(k-1) '.json'], 'w');
+    fdInput=fopen(['KOLAS_TEST\test_program\instance1\Input_opcode' num2str(k-1) '.json'], 'w');
+    fdOutput=fopen(['KOLAS_TEST\test_program\instance1\Output_opcode' num2str(k-1) '.json'], 'w');
     
     fprintf(fdInput, jsonencode(InstanceFormatIn(k)));
     fprintf(fdOutput, jsonencode(InstanceFormatOut(k)));
