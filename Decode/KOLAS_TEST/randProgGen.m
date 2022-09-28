@@ -16,7 +16,7 @@ set_lights = [set_light_1in set_light_2in set_light_3in];
 set_heavys = [set_heavy_1in set_heavy_2in];
 
 % signextend, slt, sgt, and, or, xor, byte, sar are not included
-set_arith_samples = {'01', '02', '03', '04', '20', '05', '06', '07', '08', '09', '0a'};
+set_arith_samples = {'01', '02', '03', '04', '05', '06', '07', '08', '09', '0a'};
 set_logic_samples = {'14', '15', '1b', '1c', '10', '11', '19'};
 
 set_1ins = [set_light_1in set_heavy_1in];
@@ -31,7 +31,10 @@ bytecode = {};
 NStacks=0;
 for i=1:s_D
     thisOp = oplist{i};
-    d = 1*ismember(thisOp, set_1ins)+2*ismember(thisOp, set_2ins)+3*ismember(thisOp, set_3ins); 
+    d = 1*ismember(thisOp, set_1ins)+2*ismember(thisOp, set_2ins)+3*ismember(thisOp, set_3ins);
+    if d ==0
+        error('%s has no d', thisOp)
+    end
     a = 1;
     if ~ismember(thisOp, set_hash)
         while NStacks < d
