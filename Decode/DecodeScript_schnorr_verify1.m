@@ -1,5 +1,11 @@
 clear
 clc
+
+% Program inputs
+
+
+
+
 global oplist code set_pushes set_ariths set_dups set_swaps set_logs cjmplist ...
     environ_pts codewdata call_pt calldepth op_pointer cjmp_pointer ...
  set_normalhalt storage_pt callcode_suffix callcode_suffix_pt ...

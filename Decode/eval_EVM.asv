@@ -44,11 +44,9 @@ else
             outputs=vpa(inputs(1)-inputs(2));
         case '04' %div
             assert(inputlen==2)
-            if double(inputs(2)==0)
+            if double(inputs(1)==0)
                 outputs=vpa(0);
             else
-                inputs(1) = mod(inputs(1), vpa(2^256));
-                inputs(2) = mod(inputs(2), vpa(2^256));
                 outputs=vpa(floor(inputs(1)/inputs(2)));
             end
         case '05' %sdiv
@@ -58,15 +56,13 @@ else
             elseif double(inputs(1)==vpa(-2^255)) && double(inputs(2)==-1)
                 outputs=vpa(-2^255);
             else
-                outputs=vpa(sign(inputs(1)/inputs(2))*floor(abs(inputs(1)/inputs(2))));
+                outputs=vpa(sign(inputs(1)/inputs(2))*floor(inputs(1)/inputs(2)));
             end
         case '06' %mod
             assert(inputlen==2)
             if double(inputs(2) == 0)
                 outputs = vpa(0);
             else
-                inputs(1) = mod(inputs(1), vpa(2^256));
-                inputs(2) = mod(inputs(2), vpa(2^256));
                 outputs = vpa(mod(inputs(1),inputs(2)));
             end
         case '07' %smod
@@ -74,7 +70,7 @@ else
             if double(inputs(2) == 0)
                 outputs = vpa(0);
             else
-                outputs = vpa(sign(inputs(1))*mod(abs(inputs(1)),abs(inputs(2))));
+                outputs = vpa(sign(inputs(1))*mod(inputs(1),inputs(2)));
             end
         case '08' %addmod
             assert(inputlen==3)
@@ -187,7 +183,7 @@ else
 %             cc=hd_bin2dec(bb);
 %             dd=hd_dec2hex(cc,2);
 %             outputs=hd_hex2dec(dd);
-            inputs(1) = mod(inputs(1), vpa(2^256));
+            inputs(1) = mod(inputs(2), vpa(2^256));
             inputs(2) = mod(inputs(2), vpa(2^256));
             switch op
                 case '1b' %shl: bit left shift
@@ -198,7 +194,6 @@ else
                     outputs = vpa(floor(inputs(2)/vpa(2^(inputs(1)-8))));
             end
         case '1d' %sar: arithmetic signed right shift operation
-            inputs(1) = mod(inputs(1), vpa(2^256));
             outputs = vpa(floor(inputs(2)/vpa(2^inputs(1))));
             
         case '20'
@@ -227,13 +222,13 @@ else
             error('opcode %s is not defined',op)
             
     end
-    %outputlen=size(t_oplist.pt_outputs,1);
-    %pt_outputs=t_oplist.pt_outputs;
-    %for i=1:outputlen
-%        pt=pt_outputs(i,:);
- %       bytes=pt(3);
-  %      outputs(i)=mod(outputs(i),vpa(2^(8*bytes)));
-   % end
+    outputlen=size(t_oplist.pt_outputs,1);
+    pt_outputs=t_oplist.pt_outputs;
+    for i=1:outputlen
+        pt=pt_outputs(i,:);
+        bytes=pt(3);
+        outputs(i)=mod(outputs(i),vpa(2^(8*bytes)));
+    end
     
     oplist(op_pointer).outputs=outputs.';
     output=outputs(wire_pointer);
